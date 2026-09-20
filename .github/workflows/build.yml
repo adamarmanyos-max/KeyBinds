@@ -1,0 +1,39 @@
+# Builds the Single Key Debug Fabric mod (Minecraft 1.16.1) on JDK 17.
+# Put this file at: .github/workflows/build.yml
+# It only works if the rest of the mod source is in the same repo
+# (build.gradle, settings.gradle, gradle.properties, src/...).
+
+name: Build mod jar
+
+on:
+  push:
+  workflow_dispatch:   # lets you press "Run workflow" manually in the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: Build the mod
+        run: gradle build --no-daemon --stacktrace
+
+      - name: Upload the jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: skdebug-jar
+          path: build/libs/*.jar
+          if-no-files-found: error

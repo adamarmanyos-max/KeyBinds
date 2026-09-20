@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "skdebug",
+  "version": "${version}",
+  "name": "Single Key Debug",
+  "environment": "client",
+  "entrypoints": { "client": ["com.example.skdebug.SingleKeyDebug"] },
+  "depends": { "fabricloader": ">=0.11.0", "fabric": "*", "minecraft": "1.16.x" }
+}

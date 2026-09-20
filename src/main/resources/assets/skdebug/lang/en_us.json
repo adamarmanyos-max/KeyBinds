@@ -1,0 +1,6 @@
+{
+  "key.categories.skdebug": "Single Key Debug",
+  "key.skdebug.debug": "Toggle Debug Screen (F3)",
+  "key.skdebug.hitboxes": "Toggle Hitboxes (F3+B)",
+  "key.skdebug.chunkborders": "Toggle Chunk Borders (F3+G)"
+}

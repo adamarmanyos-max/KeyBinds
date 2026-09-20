@@ -1,0 +1,30 @@
+plugins {
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+}
+
+version = '1.0.0'
+group = 'com.example.skdebug'
+
+repositories { mavenCentral() }
+
+dependencies {
+    // Verify at https://linkie.shedaniel.dev/dependencies?loader=fabric&version=1.16.1
+    minecraft "com.mojang:minecraft:1.16.1"
+    mappings "net.fabricmc:yarn:1.16.1+build.21:v2"
+    modImplementation "net.fabricmc:fabric-loader:0.14.24"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.14.0+build.371-1.16"
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") { expand "version": project.version }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 8
+}
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(17) }
+}

@@ -1,13 +1,11 @@
 # Builds the Single Key Debug Fabric mod (Minecraft 1.16.1) on JDK 17.
-# Put this file at: .github/workflows/build.yml
-# It only works if the rest of the mod source is in the same repo
-# (build.gradle, settings.gradle, gradle.properties, src/...).
+# Path in the repo must be exactly: .github/workflows/build.yml
 
 name: Build mod jar
 
 on:
   push:
-  workflow_dispatch:   # lets you press "Run workflow" manually in the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,25 +13,46 @@ jobs:
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Show what is actually in the repo
+        run: |
+          echo "===== FILE TREE ====="
+          find . -path ./.git -prune -o -type f -print | sort
+          echo "===== settings.gradle locations ====="
+          find . -name settings.gradle -not -path './.git/*' || true
+
+      - name: Locate the Gradle project
+        id: locate
+        run: |
+          DIR=$(dirname "$(find . -name settings.gradle -not -path './.git/*' | head -n 1)")
+          if [ -z "$DIR" ] || [ "$DIR" = "." ] && [ ! -f ./settings.gradle ]; then
+            echo "::error::No settings.gradle found anywhere in the repo."
+            echo "You need build.gradle, settings.gradle, gradle.properties and src/ uploaded too."
+            exit 1
+          fi
+          echo "Building in: $DIR"
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+          cache-disabled: true
 
       - name: Build the mod
-        run: gradle build --no-daemon --stacktrace
+        working-directory: ${{ steps.locate.outputs.dir }}
+        run: gradle build --no-daemon --stacktrace --info
 
       - name: Upload the jar
         uses: actions/upload-artifact@v4
         with:
           name: skdebug-jar
-          path: build/libs/*.jar
+          path: ${{ steps.locate.outputs.dir }}/build/libs/*.jar
           if-no-files-found: error
